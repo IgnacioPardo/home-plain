@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "dataSourceId": "00000000-0000-4000-8000-000000000902",
+  "syncedAt": "2026-01-01T00:00:00.000Z",
+  "source": "import",
+  "items": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "url": "https://example.com/items/1",
+      "name": "Mesa de ejemplo",
+      "room": "Living",
+      "priority": "Esencial",
+      "status": "En lista",
+      "origin": "Propuesto",
+      "initialQuantity": "1",
+      "targetQuantity": "1",
+      "quality": "",
+      "condition": "Medir el espacio antes de elegir.",
+      "notes": "Registro de demostración; no representa una compra real.",
+      "estimatedPriceArs": null,
+      "reference": null
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "url": "https://example.com/items/2",
+      "name": "Silla de ejemplo",
+      "room": "Living",
+      "priority": "Esencial",
+      "status": "En lista",
+      "origin": "Propuesto",
+      "initialQuantity": "1",
+      "targetQuantity": "1",
+      "quality": "",
+      "condition": "Medir el espacio antes de elegir.",
+      "notes": "Registro de demostración; no representa una compra real.",
+      "estimatedPriceArs": null,
+      "reference": null
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
+      "url": "https://example.com/items/3",
+      "name": "Lámpara de ejemplo",
+      "room": "Trabajo",
+      "priority": "Segunda etapa",
+      "status": "En lista",
+      "origin": "Propuesto",
+      "initialQuantity": "1",
+      "targetQuantity": "1",
+      "quality": "",
+      "condition": "Medir el espacio antes de elegir.",
+      "notes": "Registro de demostración; no representa una compra real.",
+      "estimatedPriceArs": null,
+      "reference": null
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "url": "https://example.com/items/4",
+      "name": "Estante de ejemplo",
+      "room": "Dormitorio",
+      "priority": "Segunda etapa",
+      "status": "En lista",
+      "origin": "Propuesto",
+      "initialQuantity": "1",
+      "targetQuantity": "1",
+      "quality": "",
+      "condition": "Medir el espacio antes de elegir.",
+      "notes": "Registro de demostración; no representa una compra real.",
+      "estimatedPriceArs": null,
+      "reference": null
+    }
+  ]
+}

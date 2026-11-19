@@ -1,0 +1,134 @@
+.feedback-panel {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    min-width: 0;
+}
+.feedback-panel > h3 {
+    font-size: 18px;
+    margin: 0 0 14px;
+}
+.feedback-notes {
+    max-width: 760px;
+}
+.feedback-add-note {
+    margin-top: 16px;
+    min-height: 44px;
+}
+.feedback-entries {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.feedback-entries > li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 24px;
+}
+.feedback-entry h4,
+.feedback-form h4 {
+    font-size: 16px;
+    margin: 0 0 10px;
+}
+.feedback-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: baseline;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0 0 8px;
+}
+.feedback-meta strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+.feedback-body {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.65;
+    margin: 0 0 10px;
+}
+.feedback-empty,
+.feedback-notice,
+.feedback-hint {
+    color: var(--muted);
+    line-height: 1.5;
+}
+.feedback-notice {
+    padding: 12px;
+    border-left: 2px solid var(--accent-line);
+    background: var(--accent-soft);
+}
+.feedback-form {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+}
+.feedback-form label {
+    font-size: 13px;
+    font-weight: 600;
+}
+.feedback-form input,
+.feedback-form textarea,
+.feedback-form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font: inherit;
+}
+.feedback-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+.feedback-form select {
+    max-width: 180px;
+}
+.feedback-form :is(input, textarea, select, button):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+.feedback-hint {
+    font-size: 12px;
+    margin: 0 0 6px;
+}
+.feedback-form-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 4px;
+}
+.feedback-form-actions button {
+    background: var(--accent);
+    color: var(--paper);
+    border: 1px solid var(--accent);
+    padding: 10px 16px;
+    min-height: 44px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+}
+.feedback-form :disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.feedback-entries .feedback-panel {
+    margin: 12px 0 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--line);
+    border-top: 0;
+}
+@media (max-width: 600px) {
+    .feedback-form-actions button {
+        width: 100%;
+    }
+}
+
+.feedback-freshness {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin: 0 0 1rem;
+}

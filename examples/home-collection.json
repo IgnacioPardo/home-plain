@@ -1,0 +1,131 @@
+{
+  "version": 2,
+  "source": "import",
+  "importedAt": "2026-01-01T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "example-1",
+      "kind": "reference",
+      "title": "Mesa de ejemplo",
+      "subtitle": "Ejemplo",
+      "body": "Registro sintético para explorar el catálogo.",
+      "category": "Hogar",
+      "label": "Referencia",
+      "image": null,
+      "imageAlt": "",
+      "source": {
+        "title": "Ficha sintética",
+        "url": "https://example.com/items/1"
+      },
+      "imageSource": null,
+      "shoppingItemId": "00000000-0000-4000-8000-000000000001",
+      "layout": "square",
+      "tone": "paper",
+      "provenance": "home-reference",
+      "ownership": "reference",
+      "productSource": null,
+      "brand": null,
+      "model": null,
+      "materials": [],
+      "reason": null,
+      "rooms": [
+        "Living"
+      ],
+      "shoppingRelation": "exact",
+      "images": []
+    },
+    {
+      "id": "example-2",
+      "kind": "reference",
+      "title": "Silla de ejemplo",
+      "subtitle": "Ejemplo",
+      "body": "Registro sintético para explorar el catálogo.",
+      "category": "Hogar",
+      "label": "Referencia",
+      "image": null,
+      "imageAlt": "",
+      "source": {
+        "title": "Ficha sintética",
+        "url": "https://example.com/items/2"
+      },
+      "imageSource": null,
+      "shoppingItemId": "00000000-0000-4000-8000-000000000002",
+      "layout": "square",
+      "tone": "paper",
+      "provenance": "home-reference",
+      "ownership": "reference",
+      "productSource": null,
+      "brand": null,
+      "model": null,
+      "materials": [],
+      "reason": null,
+      "rooms": [
+        "Living"
+      ],
+      "shoppingRelation": "exact",
+      "images": []
+    },
+    {
+      "id": "example-3",
+      "kind": "reference",
+      "title": "Lámpara de ejemplo",
+      "subtitle": "Ejemplo",
+      "body": "Registro sintético para explorar el catálogo.",
+      "category": "Trabajo",
+      "label": "Referencia",
+      "image": null,
+      "imageAlt": "",
+      "source": {
+        "title": "Ficha sintética",
+        "url": "https://example.com/items/3"
+      },
+      "imageSource": null,
+      "shoppingItemId": "00000000-0000-4000-8000-000000000003",
+      "layout": "square",
+      "tone": "paper",
+      "provenance": "home-reference",
+      "ownership": "reference",
+      "productSource": null,
+      "brand": null,
+      "model": null,
+      "materials": [],
+      "reason": null,
+      "rooms": [
+        "Trabajo"
+      ],
+      "shoppingRelation": "exact",
+      "images": []
+    },
+    {
+      "id": "example-4",
+      "kind": "reference",
+      "title": "Estante de ejemplo",
+      "subtitle": "Ejemplo",
+      "body": "Registro sintético para explorar el catálogo.",
+      "category": "Hogar",
+      "label": "Referencia",
+      "image": null,
+      "imageAlt": "",
+      "source": {
+        "title": "Ficha sintética",
+        "url": "https://example.com/items/4"
+      },
+      "imageSource": null,
+      "shoppingItemId": "00000000-0000-4000-8000-000000000004",
+      "layout": "square",
+      "tone": "paper",
+      "provenance": "home-reference",
+      "ownership": "reference",
+      "productSource": null,
+      "brand": null,
+      "model": null,
+      "materials": [],
+      "reason": null,
+      "rooms": [
+        "Dormitorio"
+      ],
+      "shoppingRelation": "exact",
+      "images": []
+    }
+  ]
+}

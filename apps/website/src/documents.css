@@ -1,0 +1,126 @@
+.home-document {
+    max-width: 960px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+.home-document h2,
+.home-document h3,
+.home-document h4 {
+    scroll-margin-top: 2rem;
+    margin-top: 1.75em;
+}
+.home-document h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+.home-document h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+.home-document h4 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+.home-document p {
+    margin: 0.75em 0;
+    white-space: pre-wrap;
+}
+.home-document ul,
+.home-document ol {
+    padding-inline-start: 1.5rem;
+}
+.home-document ul {
+    list-style: disc;
+}
+.home-document ol {
+    list-style: decimal;
+}
+.home-document li {
+    margin: 0.4rem 0;
+}
+.home-document a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.home-document code {
+    padding: 0.1em 0.3em;
+    background: var(--surface);
+    font-size: 0.9em;
+}
+.document-callout,
+.home-document blockquote {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-inline-start: 3px solid var(--accent);
+    background: var(--surface);
+}
+.home-document details {
+    padding: 0.5rem 0;
+}
+.home-document summary {
+    cursor: pointer;
+}
+.document-table {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-block: 1.2rem;
+    border: 1px solid var(--line);
+}
+.document-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+    font-size: 0.9rem;
+}
+.document-table th,
+.document-table td {
+    min-width: 8rem;
+    overflow-wrap: normal;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--line);
+    white-space: pre-wrap;
+}
+.document-table th {
+    background: var(--surface);
+    font-weight: 600;
+}
+.document-todo {
+    display: flex;
+    align-items: start;
+    gap: 0.7rem;
+    margin: 0.7rem 0;
+}
+.document-todo input {
+    margin-top: 0.45rem;
+}
+.document-sync,
+.document-unsupported {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+.document-sync {
+    margin-block: 0.5rem 1rem;
+}
+.document-unsupported {
+    border: 1px dashed var(--line);
+    padding: 0.75rem;
+}
+@media (max-width: 600px) {
+    .home-document {
+        font-size: 0.95rem;
+    }
+    .document-table table {
+        min-width: 400px;
+    }
+    .document-table th,
+    .document-table td {
+        padding: 0.5rem;
+    }
+}
+
+.document-feedback {
+    max-width: 960px;
+}

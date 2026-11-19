@@ -1,0 +1,27 @@
+{
+  "name": "home-plain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n web,api -c blue,green \"pnpm dev:web\" \"pnpm dev:api\"",
+    "dev:web": "pnpm --filter @repo/website dev",
+    "dev:api": "pnpm --filter @repo/api dev",
+    "build": "pnpm -r build",
+    "check": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "ready": "pnpm check && pnpm test && pnpm build",
+    "start": "pnpm --filter @repo/api start",
+    "prepare": "vp config",
+    "demo:setup": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source ../../scripts/setup-demo.ts",
+    "privacy:check": "node scripts/check-public.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.33.3"
+}
