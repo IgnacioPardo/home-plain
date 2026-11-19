@@ -1,0 +1,39 @@
+name: home-plain
+services:
+  home:
+    image: home-plain:${HOME_RELEASE:-local}
+    build:
+      context: .
+      args:
+        SERVICE_VERSION: ${HOME_RELEASE:-local}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN to the HTTPS preview URL}
+      AUTH_SHARED_USERNAME: ${AUTH_SHARED_USERNAME:-home}
+      AUTH_SHARED_PASSWORD_HASH: ${AUTH_SHARED_PASSWORD_HASH:?Set the shared account password hash}
+      AUTH_OWNER_USERNAME: ${AUTH_OWNER_USERNAME:-owner}
+      AUTH_OWNER_PASSWORD_HASH: ${AUTH_OWNER_PASSWORD_HASH:?Set the owner account password hash}
+      NOTION_API_TOKEN: ${NOTION_API_TOKEN:-}
+      NOTION_HOME_PAGE_ID: ${NOTION_HOME_PAGE_ID:-00000000-0000-4000-8000-000000000901}
+      NOTION_SHOPPING_DATA_SOURCE_ID: ${NOTION_SHOPPING_DATA_SOURCE_ID:-00000000-0000-4000-8000-000000000902}
+      NOTION_FEEDBACK_DATA_SOURCE_ID: ${NOTION_FEEDBACK_DATA_SOURCE_ID:-}
+      NOTION_PRODUCT_REFERENCES_DATA_SOURCE_ID: ${NOTION_PRODUCT_REFERENCES_DATA_SOURCE_ID:-}
+      NOTION_SYNC_INTERVAL_SECONDS: ${NOTION_SYNC_INTERVAL_SECONDS:-300}
+    volumes:
+      - home-plain-data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  home-plain-data:

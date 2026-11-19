@@ -1,0 +1,119 @@
+.room-tabs {
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+}
+.room-heading {
+    margin: 28px 0 18px;
+}
+.room-heading h2 {
+    font-size: 22px;
+    font-weight: 550;
+}
+.room-needs,
+.room-criteria,
+.room-references {
+    margin-top: 36px;
+}
+.room-needs > h3,
+.room-criteria > h3,
+.room-references h3 {
+    font-size: 17px;
+    font-weight: 550;
+    margin-bottom: 18px;
+}
+.room-need-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.room-need-list > button {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 14px;
+    text-align: left;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+}
+.room-need-list > button > span:not(.item-photo):not(.badge) {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.room-need-list small {
+    display: block;
+    color: var(--muted);
+    margin-top: 3px;
+}
+.room-criteria details {
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+}
+.room-criteria summary {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+.room-criteria p {
+    max-width: 850px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-top: 12px;
+}
+.room-criteria strong {
+    color: var(--ink);
+    font-weight: 500;
+}
+.room-reference-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+.room-reference-grid > button {
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    text-align: left;
+}
+.room-reference-grid img,
+.room-reference-grid > button > span {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.3;
+    object-fit: cover;
+}
+.room-reference-grid strong,
+.room-reference-grid small {
+    display: block;
+    padding: 14px 16px 0;
+    font-weight: 500;
+    line-height: 1.5;
+}
+.room-reference-grid small {
+    padding-top: 4px;
+    padding-bottom: 16px;
+    color: var(--muted);
+}
+@media (max-width: 760px) {
+    .room-need-list {
+        grid-template-columns: 1fr;
+    }
+    .room-reference-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .room-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 14px;
+    }
+    .room-references .section-heading {
+        align-items: flex-start;
+    }
+}

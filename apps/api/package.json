@@ -1,0 +1,32 @@
+{
+  "name": "@repo/api",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "typecheck": "tsc --noEmit",
+    "dev": "node --watch --import=tsx --conditions=@repo/source --env-file-if-exists=../../.env src/index.ts",
+    "start": "node --env-file-if-exists=../../.env dist/index.js",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@hono/node-server": "catalog:",
+    "@hono/trpc-server": "catalog:",
+    "@repo/backend": "workspace:*",
+    "@repo/logger": "workspace:*",
+    "@repo/telemetry": "workspace:*",
+    "hono": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
