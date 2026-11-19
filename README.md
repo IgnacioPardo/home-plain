@@ -1,51 +1,58 @@
 # Home Plain
 
-A home-planning app with a catalog, shopping checklist, room views, visual references, documents and notes. Spanish UI, light/dark themes and mobile layouts. Built with React, TanStack Router/Query, Hono, tRPC, Zod and Vite+ in a pnpm workspace.
+A home-planning app with a catalog, shopping checklist, room views, visual references, documents and notes. Spanish UI, light/dark themes and mobile layouts. Built with React, TanStack Router/Query, Hono, tRPC, Zod, PostgreSQL and Drizzle in a pnpm workspace.
 
-The repository contains application code and synthetic examples. It has fresh Git history, generic accounts, no imported photos or personal records, and no automatic deployment. Notion is optional for exploring the demo.
+The repository contains application code and synthetic examples. It has fresh Git history, generic accounts, no imported personal photos or records, and no automatic deployment. PostgreSQL owns application data; no Notion integration or token is required.
 
 ## Run the local demo
 
-Requires Node **22.12+** and pnpm **10.33.3**.
+Requires Node **22.12+**, pnpm **10.33.3** and Docker (or a PostgreSQL server).
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm demo:setup
+docker compose -f compose.database.yml up -d --wait
+pnpm db:migrate
+pnpm demo:seed
 pnpm dev
 ```
 
-Open **http://localhost:5173**. Find the generated passwords in `data/demo-access.txt`: `home` is the shared account and `owner` is the owner. Setup generates separate random credentials, saves their hashes in `.env`, and installs four clearly synthetic example records. It refuses to overwrite an existing `.env` or `data/` directory. The files are ignored by Git and readable only by their owner.
+Open **http://localhost:5173**. Find the generated passwords in ignored `data/demo-access.txt`: `home` is the shared account and `owner` is the owner. Setup creates separate random account credentials and a database password in owner-readable files. It refuses to overwrite an existing `.env` or `data/` directory. Migrations create tables; the repeatable seed creates the household/accounts and imports four clearly synthetic records. Purchase toggles and feedback work immediately and survive API restarts.
 
-The demo runs without a Notion token. Imported examples appear as a local copy; purchase toggles and feedback writes remain disabled until an integration is configured. Example links use `example.com` and are illustrative. No actual product photos, prices, ownership claims or personal decisions are included. The API listens on `127.0.0.1:3000`; the website proxies API requests to it. Use different coordinated ports if another checkout is running.
+Example links use `example.com` and are illustrative. No actual product photos, prices, ownership claims or personal decisions are included. The API listens on `127.0.0.1:3000`; the website proxies requests to it. Use coordinated alternative ports for another checkout. `docker compose -f compose.database.yml stop` preserves the database volume.
 
-For frontend-only synthetic states, run `pnpm dev:web` and open `/stories.html`. This development page is excluded from the production entry.
+For frontend-only synthetic states, run `pnpm dev:web` and open `/stories.html`. This development page is excluded from production.
 
 ## Use your own data
 
-Follow [configuration](docs/configuration.md). Keep all personal configuration, caches, imports and media under ignored `.env` and `data/`. Never put a token in frontend source or a `VITE_` environment variable. Runtime data is a replaceable projection; Notion owns shopping and feedback records.
+Follow [configuration](docs/configuration.md). Runtime records belong in PostgreSQL; private import bundles and media belong in ignored `data/`. Keep credentials in ignored `.env` or your host secret store, never frontend code or a `VITE_` variable.
 
-Authentication is required even for local development. Shared sessions can read and add feedback; only the owner can change shopping completion. Display names are labels, not permissions. Generic feedback labels are `Persona A` and `Persona B`.
+Authentication is required even locally. Shared accounts can read and add feedback; only owners can change purchases. Each account currently belongs to one household. Every API read/write uses the household from the authenticated session. Display labels (`Persona A`, `Persona B`) do not grant permissions. Signup, invitations and multiple households per account are not implemented.
 
 ## Validate
+
+Provide `TEST_DATABASE_URL` in the shell or ignored `.env.test`. It must point to a **disposable database named `home_plain_test`**, with permission to create schemas. Tests create and remove their own random schemas; they fail if PostgreSQL is unavailable.
 
 ```sh
 pnpm privacy:check
 pnpm ready
 ```
 
-`ready` runs typechecking, tests and production builds. GitHub Actions runs these checks and validates demo setup on hosted runners. It does not deploy anything. The public-source guard rejects runtime data, unreviewed media, credential-shaped literals, personal local paths and non-synthetic identifiers. It is a guardrail, not a complete secret scanner: review new content and Git history before publishing, and review screenshots visually.
+`ready` runs typechecking, tests and production builds. Integration tests exercise committed SQL migrations, repeated imports, independent database pools, conflicting purchase versions, durable feedback retries, authentication and household isolation against real PostgreSQL. GitHub Actions supplies PostgreSQL and also validates demo setup/migration/seeding. It never deploys.
+
+The public-source guard rejects runtime data, unreviewed media, credential-shaped literals, personal paths and non-synthetic identifiers. Review new content, history and screenshots before publishing.
 
 ## Structure
 
 | Path | Purpose |
 | --- | --- |
 | `apps/website` | Browser UI and domain query hooks |
-| `apps/api` | HTTP, authentication, environment and service construction |
-| `packages/backend` | Notion adapters, schemas, projections and domain services |
+| `apps/api` | HTTP, authentication, environment, startup and database CLI |
+| `packages/backend` | Domain services, Drizzle schema, SQL migrations and validated imports |
 | `packages/client` | Browser-safe typed transport |
 | `packages/logger`, `packages/telemetry`, `packages/utils` | Shared infrastructure |
 | `examples` | Synthetic records only |
-| `scripts` | Demo setup, public-source guard and optional imports |
+| `scripts` | Demo setup, test runner and public-source guard |
 
 See [architecture](docs/architecture.md) and [publication notes](docs/publication.md).
 

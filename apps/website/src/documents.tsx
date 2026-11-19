@@ -87,7 +87,7 @@ export function DocumentPage() {
                     <p>
                         {query.isError
                             ? "No se pudo cargar este documento compartido."
-                            : "La copia de Notion todavía no está disponible."}
+                            : "Los documentos todavía no están disponibles."}
                     </p>
                     <button
                         className="button"
@@ -101,7 +101,7 @@ export function DocumentPage() {
                 <>
                     <Heading
                         title={document.title}
-                        action={<ExternalLink href={document.url}>Fuente en Notion</ExternalLink>}
+                        action={<ExternalLink href={document.url}>Ver fuente</ExternalLink>}
                     />
                     <ContentStatus data={query.data} failed={query.isError} />
                     <article className="home-document" aria-label={document.title}>
@@ -132,14 +132,14 @@ function ContentStatus({
         failed || data.state === "stale"
             ? "Última copia disponible; no se pudo confirmar una actualización."
             : data.state === "offline"
-              ? "Copia local; Notion no está conectado."
+              ? "Última copia disponible; no se pudo actualizar."
               : data.state === "unconfigured"
-                ? "Notion sin conectar."
+                ? "Datos no disponibles."
                 : data.state === "syncing"
-                  ? "Sincronizando documentos con Notion…"
+                  ? "Actualizando documentos…"
                   : data.state === "error"
-                    ? "No se pudo sincronizar con Notion."
-                    : "Al día con Notion.";
+                    ? "No se pudieron actualizar los documentos."
+                    : "Actualizado.";
     return (
         <p className="document-sync" role="status">
             {label}

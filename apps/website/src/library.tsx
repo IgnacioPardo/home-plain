@@ -3,8 +3,7 @@ import { useState } from "react";
 import type { CollectionEntry } from "@repo/client";
 import { useCollection } from "./home.queries";
 import { CollectionCard, CollectionDetail } from "./collection";
-import { ExternalLink, Heading } from "./ui";
-import { notionHome } from "./sources";
+import { Heading } from "./ui";
 import { Documents } from "./documents";
 import { useContextLink } from "./context-link";
 
@@ -30,7 +29,6 @@ export function NotesPage() {
             )}
             <div className="section-heading document-section-heading">
                 <h2>Documentos y referencias</h2>
-                <ExternalLink href={notionHome}>Abrir Notion</ExternalLink>
             </div>
             <Documents />
             {selected && <CollectionDetail entry={selected} onClose={() => setSelected(null)} />}
@@ -43,10 +41,9 @@ export function SourcesPage() {
             <Heading title="Fuentes" />
             <div className="source-intro">
                 <p>
-                    Notion conserva la lista de compras y las referencias de productos. Inventario
-                    conserva el inventario. El catálogo muestra una importación de sus campos e
-                    imágenes, con fecha y fuente. Las referencias visuales conservan su fuente y
-                    fecha de importación.
+                    Home guarda tus compras y comentarios. El catálogo muestra los objetos
+                    importados, con sus imágenes, fecha y fuente. Las referencias visuales conservan
+                    su fuente y fecha de importación.
                 </p>
             </div>
             <Documents />

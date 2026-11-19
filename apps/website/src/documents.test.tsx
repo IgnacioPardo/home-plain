@@ -181,7 +181,7 @@ it("shows initial synchronization without claiming that configured documents are
     index = { configured: true, state: "syncing", syncedAt: null, documents: [] };
     documentResult = { configured: true, state: "syncing", syncedAt: null, document: null };
     await act(async () => root.render(<Documents />));
-    expect(container.textContent).toContain("Sincronizando documentos");
+    expect(container.textContent).toContain("Actualizando documentos");
     expect(container.textContent).not.toContain("No hay una copia");
     await act(async () => root.render(<DocumentPage />));
     expect(container.textContent).toContain("Cargando documento");

@@ -33,7 +33,12 @@ const saved = {
         items: [{ ...pending.snapshot.items[0], status: "Comprado" }],
     },
 };
-const input = { id: pending.snapshot.items[0]!.id, purchased: true, expectedStatus: "En lista" };
+const input = {
+    id: pending.snapshot.items[0]!.id,
+    purchased: true,
+    expectedStatus: "En lista",
+    expectedVersion: 0,
+};
 function deferred<T>() {
     let resolve!: (value: T) => void;
     let reject!: (error: Error) => void;
@@ -122,7 +127,7 @@ it("does not let a GET started before or during a save overwrite confirmed compl
     expect(container.querySelector("p")?.textContent).toBe("Comprado");
     expect(transport.mutate).toHaveBeenCalledExactlyOnceWith(input);
 });
-it("re-reads Notion after an ambiguous failure without retrying the write", async () => {
+it("re-reads the database after an ambiguous failure without retrying the write", async () => {
     await mount();
     transport.mutate.mockRejectedValueOnce(new Error("Lost response"));
     transport.query.mockResolvedValueOnce(saved);

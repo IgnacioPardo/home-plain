@@ -56,12 +56,12 @@ function Discussion({ target, account }: { target: FeedbackTarget | null; accoun
             {query.data && query.data.state !== "live" && (
                 <p className="feedback-notice" role="status">
                     {query.data.state === "syncing"
-                        ? "Cargando comentarios desde Notion…"
+                        ? "Cargando comentarios…"
                         : !query.data.configured
-                          ? "Los comentarios todavía no están conectados a Notion."
+                          ? "Los comentarios no están disponibles."
                           : query.data.snapshot
-                            ? "Se muestra la última copia guardada. No se pudo actualizar desde Notion."
-                            : "No se pudo leer Notion. Tu texto se conserva si falla el envío."}
+                            ? "Se muestra la última copia guardada. No se pudo actualizar."
+                            : "No se pudieron cargar los comentarios. Tu texto se conserva si falla el envío."}
                 </p>
             )}
             {query.data?.snapshot && (
@@ -189,7 +189,7 @@ function FeedbackComposer({
         if (!storeFeedbackDraft(key, pending)) {
             setStorageError(true);
             setMessage(
-                "No se pudo conservar el envío en esta pestaña. No se envió a Notion; copiá tu texto antes de recargar.",
+                "No se pudo conservar el envío en esta pestaña. No se envió; copiá tu texto antes de recargar.",
             );
             return;
         }
@@ -243,7 +243,10 @@ function FeedbackComposer({
                 value={draft.displayAuthor}
                 disabled={submitted || save.isPending || !enabled || recoveryError}
                 onChange={(event) =>
-                    updateDraft({ ...draft, displayAuthor: event.target.value as "Persona A" | "Persona B" })
+                    updateDraft({
+                        ...draft,
+                        displayAuthor: event.target.value as "Persona A" | "Persona B",
+                    })
                 }
             >
                 <option>Persona A</option>

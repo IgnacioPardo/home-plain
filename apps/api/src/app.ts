@@ -5,38 +5,19 @@ import { bodyLimit } from "hono/body-limit";
 import { trpcServer } from "@hono/trpc-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { z } from "zod";
-import {
-    buildRouter,
-    type ShoppingService,
-    type FeedbackService,
-    type CollectionSource,
-    type MoodboardSnapshot,
-    type MoodboardService,
-    type ContentService,
-    type AuthSession,
-} from "@repo/backend";
+import { buildRouter, authSessionSchema, type HomeRepository, type Identity } from "@repo/backend";
 import type { AuthenticationService } from "./auth/auth.service.ts";
 
 const credentialsSchema = z
     .object({ username: z.string().min(1).max(64), password: z.string().min(1).max(1024) })
     .strict();
-type AppOptions = {
-    auth: AuthenticationService;
-    content?: ContentService;
-    feedback?: FeedbackService | null;
-};
-
 export function createApp(
-    service: ShoppingService,
+    store: HomeRepository,
     origin: string,
-    collection: CollectionSource = null,
+    auth: AuthenticationService,
     mediaDirectory?: string,
-    moodboard: MoodboardSnapshot | MoodboardService | null = null,
-    options?: AppOptions,
 ) {
-    if (!options?.auth) throw new Error("An authentication service is required.");
-    const { auth } = options;
-    const app = new Hono<{ Variables: { session: AuthSession | null } }>();
+    const app = new Hono<{ Variables: { session: Identity | null } }>();
     const allowed = new URL(origin);
     const secure = allowed.protocol === "https:";
     const cookieName = secure ? "__Host-home-session" : "home-session";
@@ -67,7 +48,7 @@ export function createApp(
             return c.json({ error: "Untrusted origin" }, 403);
         if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method) && requestOrigin !== allowed.origin)
             return c.json({ error: "Origin required" }, 403);
-        const session = auth.read(getCookie(c, cookieName));
+        const session = await auth.read(getCookie(c, cookieName));
         c.set("session", session);
         const privatePath = /^\/(trpc|media)(\/|$)/.test(c.req.path);
         if (privatePath && !session) return c.json({ error: "Iniciá sesión para continuar." }, 401);
@@ -80,7 +61,9 @@ export function createApp(
         await next();
         c.header("Cache-Control", "no-store");
     });
-    app.get("/auth/session", (c) => c.json({ session: c.get("session") }));
+    app.get("/auth/session", (c) =>
+        c.json({ session: c.get("session") ? authSessionSchema.parse(c.get("session")) : null }),
+    );
     app.post(
         "/auth/login",
         bodyLimit({
@@ -109,7 +92,7 @@ export function createApp(
             // Login always rotates an existing session, including when changing roles.
             auth.logout(getCookie(c, cookieName));
             setCookie(c, cookieName, result.token, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 });
-            return c.json({ session: result.session });
+            return c.json({ session: authSessionSchema.parse(result.session) });
         },
     );
     app.post("/auth/logout", (c) => {
@@ -125,13 +108,15 @@ export function createApp(
         "/trpc/*",
         trpcServer({
             endpoint: "/trpc",
-            router: buildRouter(service, collection, moodboard, options),
+            router: buildRouter(store),
             createContext: (_options, c) => ({ session: c.get("session") }),
         }),
     );
     if (mediaDirectory) {
         app.get("/media/:name", async (c, next) => {
             if (!/^[a-zA-Z0-9_-]+\.(png|jpe?g|webp|avif)$/.test(c.req.param("name")))
+                return c.notFound();
+            if (!(await store.hasMedia(c.get("session")!, c.req.param("name"))))
                 return c.notFound();
             const response = await serveStatic({
                 root: mediaDirectory,
@@ -140,6 +125,7 @@ export function createApp(
             return response ?? c.res;
         });
     }
+    app.onError((_error, c) => c.json({ error: "No se pudo completar la operación." }, 503));
     app.notFound((c) => c.json({ error: "Not found" }, 404));
     return app;
 }

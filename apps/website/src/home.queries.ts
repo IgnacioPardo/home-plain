@@ -60,7 +60,7 @@ export function useSetPurchased() {
                 throw new Error(
                     error instanceof TRPCClientError && error.data?.code
                         ? error.message
-                        : "No se pudo confirmar el cambio en Notion. Actualizá la lista antes de intentarlo de nuevo.",
+                        : "No se pudo confirmar el cambio. Actualizá la lista antes de intentarlo de nuevo.",
                 );
             }
         },
@@ -70,7 +70,7 @@ export function useSetPurchased() {
             await cache.cancelQueries({ queryKey: dashboardKey });
             cache.setQueryData(dashboardKey, result);
         },
-        // A lost response can still mean the write reached Notion. Re-read before another attempt.
+        // A lost response can still mean the write reached the database. Re-read before another attempt.
         onError: () => cache.invalidateQueries({ queryKey: dashboardKey }),
     });
 }

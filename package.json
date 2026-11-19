@@ -9,12 +9,16 @@
     "dev:api": "pnpm --filter @repo/api dev",
     "build": "pnpm -r build",
     "check": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "test": "node --env-file-if-exists=.env.test scripts/run-tests.mjs",
     "ready": "pnpm check && pnpm test && pnpm build",
     "start": "pnpm --filter @repo/api start",
     "prepare": "vp config",
     "demo:setup": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source ../../scripts/setup-demo.ts",
-    "privacy:check": "node scripts/check-public.mjs"
+    "privacy:check": "node scripts/check-public.mjs",
+    "db:migrate": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source --env-file-if-exists=../../.env src/database.ts migrate",
+    "db:bootstrap": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source --env-file-if-exists=../../.env src/database.ts bootstrap",
+    "demo:seed": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source --env-file-if-exists=../../.env src/database.ts seed",
+    "db:import": "pnpm --filter @repo/api exec node --import=tsx --conditions=@repo/source --env-file-if-exists=../../.env src/database.ts import"
   },
   "devDependencies": {
     "concurrently": "catalog:",

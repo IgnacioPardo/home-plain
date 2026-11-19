@@ -129,7 +129,7 @@ function MoodboardBrowser({ snapshot }: { snapshot: MoodboardSnapshot }) {
                 </div>
                 <div className="moodboard-source-links">
                     <ExternalLink href={source?.url ?? snapshot.source.url}>
-                        {collection === "pinterest" ? "Investigación en Notion" : "Atlas original"}
+                        {collection === "pinterest" ? "Fuente de referencias" : "Atlas original"}
                     </ExternalLink>
                     {collection === "atlas" && snapshot.source.conversation && (
                         <ExternalLink href={snapshot.source.conversation}>
