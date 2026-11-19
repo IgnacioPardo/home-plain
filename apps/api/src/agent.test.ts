@@ -82,6 +82,35 @@ it("allows one worker to claim a run, reclaims expired work and fences late resu
     expect((await store.get(f.owner, run.id)).attempts).toBe(2);
 });
 
+it("recovers a publication outage without marking valid output as a provider failure", async () => {
+    const run = await store.start(f.owner, input());
+    const publication = vi
+        .spyOn(store, "complete")
+        .mockRejectedValueOnce(new Error("Simulated database disconnect"));
+    await expect(runAgentOnce(store, { plan: async () => proposal })).rejects.toThrow(
+        "Simulated database disconnect",
+    );
+    expect(await store.get(f.owner, run.id)).toMatchObject({
+        status: "running",
+        attempts: 1,
+        issue: null,
+        proposal: null,
+    });
+    publication.mockRestore();
+    await f.db.$client.query(
+        "UPDATE agent_runs SET lease_expires_at=now()-interval '1 second' WHERE id=$1",
+        [run.id],
+    );
+    const replacement = new AgentRunStore(f.open().db, origin, true);
+    await runAgentOnce(replacement, { plan: async () => proposal });
+    expect(await replacement.get(f.owner, run.id)).toMatchObject({
+        status: "succeeded",
+        attempts: 2,
+        issue: null,
+        proposal,
+    });
+});
+
 it("cancels queued and running jobs durably and never publishes after cancellation", async () => {
     const queued = await store.start(f.owner, input());
     await store.cancel(f.owner, queued.id);
@@ -258,21 +287,19 @@ it("protects agent HTTP endpoints with login, owner role, origin and CSRF, and e
 });
 
 it("uses the Responses contract with server-only credentials and rejects refusals/incomplete output", async () => {
-    const request = vi
-        .fn<typeof fetch>()
-        .mockResolvedValue(
-            new Response(
-                JSON.stringify({
-                    status: "completed",
-                    output: [
-                        {
-                            type: "message",
-                            content: [{ type: "output_text", text: JSON.stringify(proposal) }],
-                        },
-                    ],
-                }),
-            ),
-        );
+    const request = vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(
+            JSON.stringify({
+                status: "completed",
+                output: [
+                    {
+                        type: "message",
+                        content: [{ type: "output_text", text: JSON.stringify(proposal) }],
+                    },
+                ],
+            }),
+        ),
+    );
     const planner = createOpenAIPlanner("synthetic-provider-key", "configured-model", request);
     const signal = new AbortController().signal;
     expect(
@@ -302,6 +329,26 @@ it("uses the Responses contract with server-only credentials and rejects refusal
         retryable: true,
         message: "Planning provider could not complete the request",
     });
+});
+
+it("retries interrupted provider downloads but rejects malformed completed bodies", async () => {
+    const interrupted = new ReadableStream({
+        start(controller) {
+            controller.error(new Error("Simulated transport disconnect"));
+        },
+    });
+    const request = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(new Response(interrupted))
+        .mockResolvedValueOnce(new Response("invalid JSON"));
+    const planner = createOpenAIPlanner("synthetic-provider-key", "configured-model", request);
+    const context = { room: "Living", goal: "Plan de prueba", records: [] };
+    const signal = new AbortController().signal;
+    await expect(planner.plan(context, signal)).rejects.toMatchObject({
+        retryable: true,
+        message: "Planning provider could not complete the request",
+    });
+    await expect(planner.plan(context, signal)).rejects.toMatchObject({ retryable: false });
 });
 
 it("enforces active limits across day boundaries and a rolling daily request budget", async () => {

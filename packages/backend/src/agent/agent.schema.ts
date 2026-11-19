@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export class InvalidAgentProposal extends Error {
+    constructor() {
+        super("Invalid planning proposal");
+    }
+}
+
 export const startAgentSchema = z.strictObject({
     operationId: z.string().uuid(),
     room: z.string().trim().min(1).max(100),

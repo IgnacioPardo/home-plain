@@ -8,6 +8,7 @@ import {
     agentProposalSchema,
     agentRunSchema,
     startAgentSchema,
+    InvalidAgentProposal,
     type AgentContext,
     type AgentProposal,
     type StartAgent,
@@ -176,20 +177,18 @@ export class AgentRunStore {
                 noteId = randomUUID();
                 const proposal = agentProposalSchema.parse(row.proposal);
                 const body = proposalText(proposal, row.context);
-                await tx
-                    .insert(t.feedback)
-                    .values({
-                        householdId: row.householdId,
-                        id: noteId,
-                        operationId: randomUUID(),
-                        userId: identity.userId,
-                        fingerprint: "agent-approved",
-                        kind: "note",
-                        displayAuthor: "Agente",
-                        title: `Plan: ${row.context.room}`.slice(0, 160),
-                        body,
-                        contextUrl: new URL(`/notas#nota-${noteId}`, this.origin).href,
-                    });
+                await tx.insert(t.feedback).values({
+                    householdId: row.householdId,
+                    id: noteId,
+                    operationId: randomUUID(),
+                    userId: identity.userId,
+                    fingerprint: "agent-approved",
+                    kind: "note",
+                    displayAuthor: "Agente",
+                    title: `Plan: ${row.context.room}`.slice(0, 160),
+                    body,
+                    contextUrl: new URL(`/notas#nota-${noteId}`, this.origin).href,
+                });
             }
             const [saved] = await tx
                 .update(t.agentRuns)
@@ -267,12 +266,13 @@ export class AgentRunStore {
         return rows.length === 1;
     }
     async complete(claim: AgentClaim, raw: unknown) {
-        const proposal = agentProposalSchema.parse(raw);
+        const parsed = agentProposalSchema.safeParse(raw);
+        if (!parsed.success) throw new InvalidAgentProposal();
+        const proposal = parsed.data;
         const evidence = new Set(claim.context.records.map((record) => record.id));
         if (proposal.steps.some((step) => step.evidenceIds.some((id) => !evidence.has(id))))
-            throw new Error("Unknown evidence in proposal");
-        if (proposalText(proposal, claim.context).length > 8000)
-            throw new Error("Proposal exceeds note limit");
+            throw new InvalidAgentProposal();
+        if (proposalText(proposal, claim.context).length > 8000) throw new InvalidAgentProposal();
         return this.db.transaction(async (tx) => {
             const [row] = await tx.select().from(t.agentRuns).where(fence(claim)).for("update");
             if (!row) return false;

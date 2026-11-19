@@ -1,5 +1,5 @@
 import { setTimeout as delay } from "node:timers/promises";
-import type { AgentPlanner } from "./agent.schema.ts";
+import { InvalidAgentProposal, type AgentPlanner } from "./agent.schema.ts";
 import type { AgentRunStore } from "./agent.store.ts";
 
 export class PlannerError extends Error {
@@ -33,14 +33,27 @@ export async function runAgentOnce(
     }, 10_000);
     timer.unref();
     try {
-        const proposal = await planner.plan(claim.context, signal);
-        if (!signal.aborted) await store.complete(claim, proposal);
-        else await store.fail(claim, stop.aborted || timeout.aborted);
-    } catch (error) {
-        await store.fail(
-            claim,
-            stop.aborted || timeout.aborted || (error instanceof PlannerError && error.retryable),
-        );
+        let proposal: unknown;
+        try {
+            proposal = await planner.plan(claim.context, signal);
+        } catch (error) {
+            await store.fail(
+                claim,
+                stop.aborted ||
+                    timeout.aborted ||
+                    (error instanceof PlannerError && error.retryable),
+            );
+            return true;
+        }
+        if (signal.aborted) await store.fail(claim, stop.aborted || timeout.aborted);
+        else {
+            try {
+                await store.complete(claim, proposal);
+            } catch (error) {
+                if (!(error instanceof InvalidAgentProposal)) throw error;
+                await store.fail(claim, false);
+            }
+        }
     } finally {
         clearInterval(timer);
         if (heartbeat) await heartbeat;

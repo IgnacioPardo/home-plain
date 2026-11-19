@@ -50,8 +50,14 @@ export function createOpenAIPlanner(
             }
             if (!response.ok)
                 throw new PlannerError(response.status === 429 || response.status >= 500);
+            let body: string;
             try {
-                const parsed = responseSchema.parse(await response.json());
+                body = await response.text();
+            } catch {
+                throw new PlannerError(true);
+            }
+            try {
+                const parsed = responseSchema.parse(JSON.parse(body));
                 const text = parsed.output
                     .filter((item) => item.type === "message")
                     .flatMap((item) => item.content ?? [])
