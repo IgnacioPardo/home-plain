@@ -1,5 +1,19 @@
 name: home-plain
 services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-home}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a database password}
+      POSTGRES_DB: ${POSTGRES_DB:-home_plain}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
   home:
     image: home-plain:${HOME_RELEASE:-local}
     build:
@@ -7,22 +21,22 @@ services:
       args:
         SERVICE_VERSION: ${HOME_RELEASE:-local}
     restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
     ports:
       - "127.0.0.1:3000:3000"
     environment:
       APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN to the HTTPS preview URL}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-home}:${POSTGRES_PASSWORD:?Set a database password}@database:5432/${POSTGRES_DB:-home_plain}
+      HOUSEHOLD_ID: ${HOUSEHOLD_ID:-00000000-0000-4000-8000-000000000902}
+      HOUSEHOLD_NAME: ${HOUSEHOLD_NAME:-Home}
       AUTH_SHARED_USERNAME: ${AUTH_SHARED_USERNAME:-home}
-      AUTH_SHARED_PASSWORD_HASH: ${AUTH_SHARED_PASSWORD_HASH:?Set the shared account password hash}
+      AUTH_SHARED_PASSWORD_HASH: ${AUTH_SHARED_PASSWORD_HASH:-}
       AUTH_OWNER_USERNAME: ${AUTH_OWNER_USERNAME:-owner}
-      AUTH_OWNER_PASSWORD_HASH: ${AUTH_OWNER_PASSWORD_HASH:?Set the owner account password hash}
-      NOTION_API_TOKEN: ${NOTION_API_TOKEN:-}
-      NOTION_HOME_PAGE_ID: ${NOTION_HOME_PAGE_ID:-00000000-0000-4000-8000-000000000901}
-      NOTION_SHOPPING_DATA_SOURCE_ID: ${NOTION_SHOPPING_DATA_SOURCE_ID:-00000000-0000-4000-8000-000000000902}
-      NOTION_FEEDBACK_DATA_SOURCE_ID: ${NOTION_FEEDBACK_DATA_SOURCE_ID:-}
-      NOTION_PRODUCT_REFERENCES_DATA_SOURCE_ID: ${NOTION_PRODUCT_REFERENCES_DATA_SOURCE_ID:-}
-      NOTION_SYNC_INTERVAL_SECONDS: ${NOTION_SYNC_INTERVAL_SECONDS:-300}
+      AUTH_OWNER_PASSWORD_HASH: ${AUTH_OWNER_PASSWORD_HASH:-}
     volumes:
-      - home-plain-data:/app/data
+      - home-plain-media:/app/data
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -36,4 +50,5 @@ services:
         max-size: "10m"
         max-file: "3"
 volumes:
-  home-plain-data:
+  postgres-data:
+  home-plain-media:

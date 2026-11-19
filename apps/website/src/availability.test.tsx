@@ -218,7 +218,7 @@ it.each(["unconfigured", "error"] as const)(
         await act(async () => root.render(<PlanPage />));
         expect(container.textContent).toContain("Datos de compras no disponibles.");
         expect(container.textContent).not.toContain("No hay compras registradas.");
-        expect(container.textContent).not.toContain("No hay precios registrados en Notion.");
+        expect(container.textContent).not.toContain("No hay precios registrados.");
         expect(container.textContent).not.toContain("0 de 0 objetos");
     },
 );
@@ -226,7 +226,7 @@ it.each(["unconfigured", "error"] as const)(
 it("reports a successfully loaded empty plan and its missing prices", async () => {
     await act(async () => root.render(<PlanPage />));
     expect(container.textContent).toContain("No hay compras registradas.");
-    expect(container.textContent).toContain("No hay precios registrados en Notion.");
+    expect(container.textContent).toContain("No hay precios registrados.");
 });
 
 it.each(["cancel", "close button"])(

@@ -287,19 +287,6 @@ kbd {
     flex-direction: column;
     gap: 14px;
 }
-.header-notion {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    min-height: 40px;
-    color: var(--muted);
-    font-size: 11px;
-}
-.header-notion > svg:first-child {
-    display: none;
-}
 main {
     width: 100%;
     max-width: 1520px;

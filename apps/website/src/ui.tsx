@@ -59,12 +59,12 @@ export function SyncStatus() {
         );
     const data = query.data;
     const labels = {
-        live: "Al día con Notion",
-        offline: "Copia local de Notion",
+        live: "Actualizado",
+        offline: "Última copia disponible",
         stale: "Última copia disponible",
-        unconfigured: "Notion sin conectar",
-        error: "Sin conexión con Notion",
-        syncing: "Sincronizando con Notion…",
+        unconfigured: "Datos no disponibles",
+        error: "No se pudo actualizar",
+        syncing: "Actualizando…",
     };
     const date = data.snapshot
         ? new Date(data.snapshot.syncedAt).toLocaleString("es-AR", {
@@ -84,12 +84,8 @@ export function SyncStatus() {
             <button
                 disabled={!data.configured || refresh.isPending}
                 onClick={() => refresh.mutate()}
-                aria-label="Actualizar desde Notion"
-                title={
-                    data.configured
-                        ? "Actualizar desde Notion"
-                        : "La sincronización automática todavía no está conectada"
-                }
+                aria-label="Actualizar"
+                title={data.configured ? "Actualizar" : "Los datos todavía no están disponibles"}
             >
                 <RefreshCw size={13} className={refresh.isPending ? "spin" : ""} />
             </button>
@@ -207,7 +203,7 @@ export function ShoppingDetail({ item, onClose }: { item: ShoppingItem; onClose:
                 </div>
                 <FeedbackPanel target={{ kind: "shopping", id: item.id }} />
                 <div className="detail-actions">
-                    <ExternalLink href={item.url}>Abrir ficha en Notion</ExternalLink>
+                    <ExternalLink href={item.url}>Ver fuente</ExternalLink>
                     {item.reference && (
                         <ExternalLink href={item.reference}>Ver referencia</ExternalLink>
                     )}

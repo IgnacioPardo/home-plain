@@ -5,7 +5,7 @@ export default defineConfig({
         target: "node22",
         outDir: "dist",
         minify: false,
-        lib: { entry: { index: "src/index.ts" }, formats: ["es"] },
+        lib: { entry: { index: "src/index.ts", database: "src/database.ts" }, formats: ["es"] },
         rollupOptions: {
             external: (id) => !id.startsWith(".") && !isAbsolute(id),
             output: {

@@ -186,7 +186,7 @@ it("renders feedback as text, exposes author/time, and opens comments on notes",
         expect.anything(),
     );
 });
-it("disables saving when the integration or durable journal is unavailable", async () => {
+it("disables saving when the service is unavailable", async () => {
     transport.list.mockResolvedValue({
         ...empty,
         canCreate: false,
@@ -196,7 +196,7 @@ it("disables saving when the integration or durable journal is unavailable", asy
     });
     await render();
     expect(container.querySelector<HTMLButtonElement>("button[type=submit]")?.disabled).toBe(true);
-    expect(container.textContent).toContain("todavía no están conectados");
+    expect(container.textContent).toContain("no están disponibles");
     expect(transport.create).not.toHaveBeenCalled();
 });
 
@@ -320,7 +320,7 @@ it("fails visibly before dispatch if the exact pending operation cannot be persi
     });
     await submit();
     expect(transport.create).not.toHaveBeenCalled();
-    expect(container.textContent).toContain("No se envió a Notion");
+    expect(container.textContent).toContain("No se envió");
     expect(container.querySelector("textarea")!.value).toBe("No perder el identificador.");
     vi.unstubAllGlobals();
     transport.create.mockImplementationOnce(async (input) => ({

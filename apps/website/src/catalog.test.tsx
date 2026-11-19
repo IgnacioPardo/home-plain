@@ -245,7 +245,7 @@ it("preserves a legacy note title and descriptive subtitle", async () => {
     expect(container.querySelector("dialog h2")?.textContent).toBe("Medidas");
     expect(container.querySelector(".detail-subtitle")?.textContent).toBe("Medidas del living");
 });
-it("keeps notes textual and reports retained imports independently of shopping sync", async () => {
+it("keeps notes textual and reports retained imports alongside persisted purchases", async () => {
     state.stale = true;
     await act(async () =>
         root.render(
@@ -257,7 +257,7 @@ it("keeps notes textual and reports retained imports independently of shopping s
     );
     expect(container.querySelector(".catalog-note img")).toBeNull();
     expect(container.textContent).toContain("Se conserva el catálogo anterior");
-    expect(container.textContent).toContain("La lista de compras se sincroniza por separado");
+    expect(container.textContent).toContain("Los cambios de compra se guardan en Home");
 });
 
 it("switches gallery images without changing the model and keeps product/record attribution separate", async () => {

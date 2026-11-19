@@ -60,49 +60,5 @@ export const moodboardSnapshotSchema = z.object({
         .optional(),
     references: referencesSchema,
 });
-export const pinterestSelectionSchema = z.object({
-    title: z.string().min(1),
-    url: sourceUrl,
-    references: z
-        .array(z.object({ ...referenceFields }))
-        .min(1)
-        .superRefine((refs, ctx) => {
-            if (new Set(refs.map((ref) => ref.id)).size !== refs.length)
-                ctx.addIssue({ code: "custom", message: "Duplicate reference IDs" });
-        }),
-});
-export const atlasExportSchema = z
-    .object({
-        source: z.object({ url: sourceUrl, conversation: sourceUrl.nullable().default(null) }),
-        title: z.string().min(1),
-        references: z
-            .array(
-                z.object({
-                    ...referenceFields,
-                    image: z.string().regex(/^images\/[a-f0-9]{14}\.jpg$/),
-                    thumb: z.string().regex(/^images\/[a-f0-9]{14}-t\.jpg$/),
-                }),
-            )
-            .min(1),
-        counts: z.object({
-            images: z.number().int().positive(),
-            sources: z.number().int().positive(),
-            styles: z.number().int().positive(),
-        }),
-    })
-    .superRefine((data, ctx) => {
-        const refs = data.references;
-        if (
-            new Set(refs.map((ref) => ref.id)).size !== refs.length ||
-            refs.length !== data.counts.images ||
-            new Set(refs.map((ref) => ref.projectKey)).size !== data.counts.sources ||
-            new Set(refs.flatMap((ref) => ref.styles)).size !== data.counts.styles ||
-            refs.some(
-                (ref) =>
-                    ref.image !== `images/${ref.id}.jpg` || ref.thumb !== `images/${ref.id}-t.jpg`,
-            )
-        )
-            ctx.addIssue({ code: "custom", message: "Incomplete or inconsistent atlas export" });
-    });
 export type MoodboardReference = z.infer<typeof moodboardReferenceSchema>;
 export type MoodboardSnapshot = z.infer<typeof moodboardSnapshotSchema>;

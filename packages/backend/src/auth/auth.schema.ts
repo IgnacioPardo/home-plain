@@ -6,4 +6,6 @@ export const authSessionSchema = z.object({
     csrfToken: z.string(),
 });
 export type AuthSession = z.infer<typeof authSessionSchema>;
-export type RequestContext = { session: AuthSession | null };
+export type RequestContext = {
+    session: (AuthSession & { userId: string; householdId: string }) | null;
+};

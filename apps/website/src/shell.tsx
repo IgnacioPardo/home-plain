@@ -1,8 +1,6 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-    ArrowUpRight,
-    BookOpen,
     Grid2X2,
     House,
     Images,
@@ -12,8 +10,7 @@ import {
     StickyNote,
 } from "lucide-react";
 import { GlobalSearch } from "./search";
-import { ExternalLink, Modal, SyncStatus } from "./ui";
-import { notionHome } from "./sources";
+import { Modal, SyncStatus } from "./ui";
 import { ThemeToggle } from "./theme";
 import { SessionControls } from "./auth";
 import { ItemPhotosProvider } from "./item-photos";
@@ -89,30 +86,15 @@ function ShellContent() {
                         </button>
                         <div className="header-account">
                             <SessionControls />
-                            <a
-                                className="header-notion"
-                                href={notionHome}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <BookOpen size={16} aria-hidden="true" />
-                                Notion
-                                <ArrowUpRight size={13} />
-                            </a>
                         </div>
                     </div>
                 </div>
             </header>
             {menuOpen && (
-                <Modal
-                    title="Cuenta y enlaces"
-                    className="mobile-menu"
-                    onClose={() => setMenuOpen(false)}
-                >
+                <Modal title="Cuenta" className="mobile-menu" onClose={() => setMenuOpen(false)}>
                     <div className="detail-text">
-                        <h2>Cuenta y enlaces</h2>
+                        <h2>Cuenta</h2>
                         <SessionControls showLabel />
-                        <ExternalLink href={notionHome}>Abrir Notion</ExternalLink>
                     </div>
                 </Modal>
             )}

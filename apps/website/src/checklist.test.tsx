@@ -103,7 +103,7 @@ beforeEach(() => {
         isPending: false,
         isError: false,
         isSuccess: false,
-        error: new Error("No se pudo confirmar el cambio en Notion. Volvé a intentarlo."),
+        error: new Error("No se pudo confirmar el cambio. Volvé a intentarlo."),
         mutate: vi.fn(),
     };
     query = {
@@ -251,7 +251,7 @@ it("distinguishes loading, request failure and an empty source", async () => {
 
 it("disables writes without a configured integration while keeping details usable", async () => {
     await render();
-    expect(container.textContent).toContain("Notion sin conectar");
+    expect(container.textContent).toContain("Datos no disponibles");
     const checkbox = container.querySelector<HTMLInputElement>(
         '[aria-label="Marcar Colchón como comprado"]',
     )!;
@@ -264,7 +264,7 @@ it("disables writes without a configured integration while keeping details usabl
         )!.disabled,
     ).toBe(false);
 });
-it("saves check and uncheck to Notion, waits for confirmation and announces errors without fake completion", async () => {
+it("saves check and uncheck to the database, waits for confirmation and announces errors without fake completion", async () => {
     query.data!.configured = true;
     await render();
     let checkbox = container.querySelector<HTMLInputElement>(
@@ -275,11 +275,12 @@ it("saves check and uncheck to Notion, waits for confirmation and announces erro
         id: sample.id,
         purchased: true,
         expectedStatus: "En lista",
+        expectedVersion: 0,
     });
     expect(checkbox.checked).toBe(false);
     purchase.isPending = true;
     await render();
-    expect(container.textContent).toContain("Guardando en Notion…");
+    expect(container.textContent).toContain("Guardando…");
     expect(
         [...container.querySelectorAll<HTMLInputElement>('[type="checkbox"]')].every(
             (i) => i.disabled,
@@ -303,12 +304,13 @@ it("saves check and uncheck to Notion, waits for confirmation and announces erro
     )!;
     expect(checkbox.checked).toBe(true);
     expect(container.querySelector("progress")?.value).toBe(2);
-    expect(container.textContent).toContain("Estado guardado en Notion.");
+    expect(container.textContent).toContain("Estado guardado.");
     await act(async () => checkbox.click());
     expect(purchase.mutate).toHaveBeenLastCalledWith({
         id: sample.id,
         purchased: false,
         expectedStatus: "Comprado",
+        expectedVersion: 0,
     });
 });
 it("returns keyboard focus to the active filter when a saved item leaves the pending view", async () => {
@@ -344,5 +346,7 @@ it("keeps purchase changes disabled for the shared commenter account", async () 
 it("keeps missing reference photos explicit for every visible shopping item", async () => {
     await render();
     expect(container.querySelectorAll(".checklist-item img")).toHaveLength(0);
-    expect(container.querySelectorAll(".checklist-item .image-fallback")).toHaveLength(items.length);
+    expect(container.querySelectorAll(".checklist-item .image-fallback")).toHaveLength(
+        items.length,
+    );
 });

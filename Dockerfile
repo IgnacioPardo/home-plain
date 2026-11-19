@@ -9,9 +9,7 @@ RUN VP_GIT_HOOKS=0 pnpm --filter @repo/api deploy --prod --legacy /out
 FROM node:22-bookworm-slim AS runtime
 ARG SERVICE_VERSION=development
 ENV OTEL_RESOURCE_ATTRIBUTES="service.version=${SERVICE_VERSION}"
-ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 STATIC_ROOT=/app/website NOTION_CACHE_FILE=/app/data/notion-shopping.json
-ENV HOME_COLLECTION_FILE=/app/data/home-collection.json HOME_MOODBOARD_FILE=/app/data/home-moodboard.json HOME_MEDIA_DIRECTORY=/app/data/media
-ENV HOME_CONTENT_FILE=/app/data/home-content.json NOTION_FEEDBACK_CACHE_FILE=/app/data/notion-feedback.json NOTION_FEEDBACK_JOURNAL_FILE=/app/data/notion-feedback-operations.json
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 STATIC_ROOT=/app/website HOME_MEDIA_DIRECTORY=/app/data/media
 WORKDIR /app
 COPY --from=build --chown=node:node /out /app
 COPY --from=build --chown=node:node /app/apps/website/dist /app/website

@@ -7,13 +7,11 @@ import {
     Badge,
     DataBoundary,
     EmptyState,
-    ExternalLink,
     formatPrice,
     Heading,
     normalize,
     ShoppingDetail,
 } from "./ui";
-import { shoppingSource } from "./sources";
 
 export type PlanSearch = {
     q?: string;
@@ -32,14 +30,7 @@ export function validatePlanSearch(search: Record<string, unknown>): PlanSearch 
 export function PlanPage() {
     return (
         <>
-            <Heading
-                title="Plan de compras"
-                action={
-                    <ExternalLink className="button" href={shoppingSource}>
-                        Editar en Notion
-                    </ExternalLink>
-                }
-            />
+            <Heading title="Plan de compras" />
             <DataBoundary>
                 {(data) =>
                     data.snapshot ? (
@@ -47,7 +38,6 @@ export function PlanPage() {
                     ) : (
                         <EmptyState title="Datos de compras no disponibles.">
                             <p>No hay una copia disponible de la lista.</p>
-                            <ExternalLink href={shoppingSource}>Abrir Notion</ExternalLink>
                         </EmptyState>
                     )
                 }
@@ -220,7 +210,7 @@ function PlanContent({ items }: { items: ShoppingItem[] }) {
                             <p>
                                 {active
                                     ? "Probá otro ambiente o quitá un filtro."
-                                    : "Los objetos aparecerán desde tu lista de Notion."}
+                                    : "Todavía no hay objetos en tu lista."}
                             </p>
                         </EmptyState>
                     )}
@@ -308,10 +298,9 @@ function PlanInsights({ items }: { items: ShoppingItem[] }) {
                 <h2>Precios</h2>
                 <p>
                     {quoted.length
-                        ? `${quoted.length} artículos con precio registrado en Notion.`
-                        : "No hay precios registrados en Notion."}
+                        ? `${quoted.length} artículos con precio registrado.`
+                        : "No hay precios registrados."}
                 </p>
-                <ExternalLink href={shoppingSource}>Abrir en Notion</ExternalLink>
             </section>
         </aside>
     );

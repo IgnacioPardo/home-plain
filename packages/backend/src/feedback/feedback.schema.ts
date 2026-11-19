@@ -76,29 +76,9 @@ export const feedbackCreateResultSchema = z.discriminatedUnion("status", [
     z.object({ status: z.literal("saved"), entry: feedbackEntrySchema }),
     z.object({ status: z.literal("unconfirmed"), operationId: z.string().uuid() }),
 ]);
-export const feedbackReceiptSchema = z.object({
-    operationId: z.string().uuid(),
-    fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-    state: z.enum(["pending", "confirmed", "rejected"]),
-});
-export const feedbackJournalSchema = z
-    .object({
-        version: z.literal(1),
-        dataSourceId: z.string().uuid(),
-        receipts: z.array(feedbackReceiptSchema),
-    })
-    .superRefine((journal, ctx) => {
-        if (
-            new Set(journal.receipts.map((receipt) => receipt.operationId)).size !==
-            journal.receipts.length
-        )
-            ctx.addIssue({ code: "custom", message: "Duplicate operation receipts" });
-    });
 export type FeedbackTarget = z.infer<typeof feedbackTargetSchema>;
 export type CreateFeedback = z.infer<typeof createFeedbackSchema>;
 export type FeedbackEntry = z.infer<typeof feedbackEntrySchema>;
 export type FeedbackSnapshot = z.infer<typeof feedbackSnapshotSchema>;
 export type FeedbackList = z.infer<typeof feedbackListSchema>;
 export type FeedbackCreateResult = z.infer<typeof feedbackCreateResultSchema>;
-export type FeedbackReceipt = z.infer<typeof feedbackReceiptSchema>;
-export type FeedbackJournal = z.infer<typeof feedbackJournalSchema>;

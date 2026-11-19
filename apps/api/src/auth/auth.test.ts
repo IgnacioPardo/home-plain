@@ -2,11 +2,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { ShoppingService, authSessionSchema } from "@repo/backend";
+import { authSessionSchema } from "@repo/backend";
 import { createApp } from "../app.ts";
-import { readEnvironment } from "../env.ts";
-import { createTestAuth, testHashes, testPasswords } from "./test-fixture.ts";
-import { AuthenticationService } from "./auth.service.ts";
+import { readEnvironment, readBootstrapEnvironment } from "../env.ts";
+import { createTestAuth, emptyStore, testHashes, testPasswords } from "./test-fixture.ts";
 import { hashPassword, verifyPassword } from "./password.ts";
 
 const origin = "https://home.example.test";
@@ -20,14 +19,9 @@ async function fixture() {
     const directory = await mkdtemp(join(tmpdir(), "home-auth-"));
     directories.push(directory);
     await writeFile(join(directory, "private.png"), "private-image-content");
-    const service = new ShoppingService(
-        { dataSourceId: "00000000-0000-4000-8000-000000000001", intervalMs: 300_000 },
-        { load: async () => null, save: async () => {} },
-        null,
-    );
     let now = Date.now();
     const auth = createTestAuth(() => now);
-    const app = createApp(service, origin, null, directory, null, { auth });
+    const app = createApp(emptyStore, origin, auth, directory);
     return {
         app,
         auth,
@@ -125,8 +119,8 @@ it("sets a host-only secure session cookie and restricts purchase changes to the
     expect(await blocked.text()).toContain("Solo el propietario");
     const owner = await signedIn(app, "owner");
     expect(owner.body.session.role).toBe("owner");
-    // Reaches the domain's integration-configuration check only after owner authorization.
-    expect((await save(owner.headers)).status).toBe(412);
+    // The owner reaches the domain; the item is absent in this fixture.
+    expect((await save(owner.headers)).status).toBe(404);
 });
 
 it("rejects missing/foreign origins, spoofed hosts and missing/invalid CSRF tokens", async () => {
@@ -185,8 +179,8 @@ it("rotates sessions on login and revokes them on logout, expiry and process rep
     ).toBe(401);
     const expiring = await signedIn(app);
     const token = expiring.headers.Cookie.split("=")[1]!;
-    expect(auth.read(token)).not.toBeNull();
-    expect(createTestAuth().read(token)).toBeNull();
+    expect(await auth.read(token)).not.toBeNull();
+    expect(await createTestAuth().read(token)).toBeNull();
     advance(7 * 24 * 60 * 60 * 1000);
     expect(
         (await app.request(`${origin}/trpc/collection`, { headers: expiring.headers })).status,
@@ -242,17 +236,16 @@ it("fails closed on missing credentials, identical accounts and non-HTTPS produc
     const input = {
         NODE_ENV: "production",
         APP_ORIGIN: origin,
+        DATABASE_URL: "postgresql://localhost/home_plain_test",
         AUTH_SHARED_PASSWORD_HASH: testHashes.home,
         AUTH_OWNER_PASSWORD_HASH: testHashes.owner,
     };
-    expect(readEnvironment(input).AUTH_SHARED_USERNAME).toBe("home");
-    expect(() => readEnvironment({ ...input, NOTION_API_TOKEN: "synthetic-token" })).toThrow(
-        "Set your own Notion",
-    );
-    expect(() => readEnvironment({ ...input, AUTH_OWNER_USERNAME: "home" })).toThrow();
+    expect(readBootstrapEnvironment(input).AUTH_SHARED_USERNAME).toBe("home");
+    expect(() => readBootstrapEnvironment({ ...input, AUTH_OWNER_USERNAME: "home" })).toThrow();
     expect(() =>
-        readEnvironment({ ...input, AUTH_OWNER_PASSWORD_HASH: testHashes.home }),
+        readBootstrapEnvironment({ ...input, AUTH_OWNER_PASSWORD_HASH: testHashes.home }),
     ).toThrow();
+    expect(() => readEnvironment({ ...input, DATABASE_URL: "https://example.test" })).toThrow();
     for (const APP_ORIGIN of [
         "http://home.example.test",
         "http://localhost:5173",
@@ -260,7 +253,6 @@ it("fails closed on missing credentials, identical accounts and non-HTTPS produc
         "https://home.example.test/path",
     ])
         expect(() => readEnvironment({ ...input, APP_ORIGIN })).toThrow();
-    expect(() => new AuthenticationService([])).toThrow();
 });
 
 it("uses randomly salted scrypt hashes and checks passwords without storing plaintext", async () => {

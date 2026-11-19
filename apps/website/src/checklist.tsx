@@ -5,26 +5,15 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, Search, X } from "lucide-react";
 import type { ShoppingItem } from "@repo/client";
 import { useDashboard, useSetPurchased } from "./home.queries";
-import { Badge, EmptyState, ExternalLink, Heading, normalize, ShoppingDetail } from "./ui";
-import { shoppingSource } from "./sources";
+import { Badge, EmptyState, Heading, normalize, ShoppingDetail } from "./ui";
 import { useSession } from "./auth";
 import "./checklist.css";
 
 export function ChecklistPage() {
     const query = useDashboard();
-    const session = useSession();
     return (
         <div className="checklist-page">
-            <Heading
-                title="Lista para la casa"
-                action={
-                    session?.role === "owner" && (
-                        <ExternalLink className="button" href={shoppingSource}>
-                            Editar en Notion
-                        </ExternalLink>
-                    )
-                }
-            />
+            <Heading title="Lista para la casa" />
             {query.isPending || query.data?.state === "syncing" ? (
                 <div className="loading" role="status">
                     <div className="skeleton" />
@@ -58,7 +47,6 @@ export function ChecklistPage() {
             ) : (
                 <EmptyState title="Datos de compras no disponibles.">
                     <p>No hay una copia disponible de la lista.</p>
-                    <ExternalLink href={shoppingSource}>Abrir Notion</ExternalLink>
                 </EmptyState>
             )}
         </div>
@@ -113,8 +101,7 @@ function Checklist({ items, configured }: { items: ShoppingItem[]; configured: b
     if (!items.length)
         return (
             <EmptyState title="No hay compras registradas.">
-                <p>Los objetos aparecerán desde tu lista de Notion.</p>
-                <ExternalLink href={shoppingSource}>Abrir Notion</ExternalLink>
+                <p>Todavía no hay objetos en tu lista.</p>
             </EmptyState>
         );
     return (
@@ -137,12 +124,12 @@ function Checklist({ items, configured }: { items: ShoppingItem[]; configured: b
                 {!canPurchase
                     ? "Podés consultar la lista. Los cambios de compra los guarda el propietario."
                     : configured
-                      ? "Marcá lo que ya compraste. Los cambios se guardan en Notion."
-                      : "Notion sin conectar. Conectá la integración para guardar compras desde esta lista."}
+                      ? "Marcá lo que ya compraste. Los cambios se guardan en Home."
+                      : "Datos no disponibles. Volvé a cargar la lista antes de guardar cambios."}
             </p>
             {purchase.isPending && (
                 <p className="checklist-save-status" role="status">
-                    Guardando en Notion…
+                    Guardando…
                 </p>
             )}
             {purchase.isError && (
@@ -152,7 +139,7 @@ function Checklist({ items, configured }: { items: ShoppingItem[]; configured: b
             )}
             {purchase.isSuccess && (
                 <p className="checklist-save-status" role="status">
-                    Estado guardado en Notion.
+                    Estado guardado.
                 </p>
             )}
             <div className="checklist-controls">
@@ -233,6 +220,7 @@ function Checklist({ items, configured }: { items: ShoppingItem[]; configured: b
                                                     id: item.id,
                                                     purchased: item.status !== "Comprado",
                                                     expectedStatus: item.status,
+                                                    expectedVersion: item.version ?? 0,
                                                 });
                                             }}
                                         />

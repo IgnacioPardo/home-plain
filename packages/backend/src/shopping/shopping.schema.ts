@@ -4,6 +4,7 @@ export const shoppingItemSchema = z.object({
     id: z.string().uuid(),
     url: z.string().url(),
     name: z.string().min(1),
+    version: z.number().int().nonnegative().optional(),
     room: z.string(),
     priority: z.string(),
     status: z.string(),
@@ -22,7 +23,7 @@ export const snapshotSchema = z.object({
     version: z.literal(1),
     dataSourceId: z.string().uuid(),
     syncedAt: z.string().datetime(),
-    source: z.enum(["api", "import"]),
+    source: z.enum(["api", "import", "database"]),
     items: z.array(shoppingItemSchema),
 });
 export type Snapshot = z.infer<typeof snapshotSchema>;
@@ -42,5 +43,6 @@ export const setPurchasedSchema = z.strictObject({
         .transform((id) => id.toLowerCase()),
     purchased: z.boolean(),
     expectedStatus: z.string().max(200),
+    expectedVersion: z.number().int().nonnegative().default(0),
 });
 export type SetPurchased = z.infer<typeof setPurchasedSchema>;

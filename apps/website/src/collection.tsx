@@ -225,7 +225,7 @@ export function CollectionPage() {
                         dateStyle: "medium",
                         timeStyle: "short",
                     })}
-                    . La lista de compras se sincroniza por separado.
+                    . Los cambios de compra se guardan en Home.
                 </p>
             )}
             {currentSelection && (
@@ -379,14 +379,8 @@ export function CollectionDetail({ entry, onClose }: { entry: CatalogEntry; onCl
                             {entry.productSource.title}
                         </ExternalLink>
                     )}
-                    <ExternalLink href={entry.source.url}>
-                        {/^https:\/\/(?:app\.notion\.com|(?:www\.)?notion\.so)\//.test(
-                            entry.source.url,
-                        )
-                            ? "Ver en Notion"
-                            : entry.source.title}
-                    </ExternalLink>
-                    {item && <ExternalLink href={item.url}>Necesidad en Notion</ExternalLink>}
+                    <ExternalLink href={entry.source.url}>{entry.source.title}</ExternalLink>
+                    {item && <ExternalLink href={item.url}>Fuente de la compra</ExternalLink>}
                 </div>
             </div>
         </Modal>
@@ -420,7 +414,7 @@ function ShoppingCollection({
         <>
             <p className="inline-notice">
                 El catálogo todavía no está disponible. Estas son las necesidades registradas en
-                Notion.
+                Home.
             </p>
             <div className="catalog-grid">
                 {items.map((item) => (
