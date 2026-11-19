@@ -1,0 +1,54 @@
+.agent-page {
+    max-width: 850px;
+    margin-inline: auto;
+}
+.agent-form {
+    display: grid;
+    gap: 1rem;
+    margin-block: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+.agent-form label {
+    display: grid;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+.agent-form input,
+.agent-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--surface);
+    color: inherit;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+}
+.agent-form textarea {
+    resize: vertical;
+}
+.agent-form p {
+    font-size: 0.9rem;
+}
+.agent-form button {
+    justify-self: start;
+}
+.agent-run {
+    margin-block: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow-wrap: anywhere;
+}
+.agent-run h3 {
+    margin-top: 0;
+}
+.agent-run li {
+    margin-block: 1rem;
+}
+.agent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}

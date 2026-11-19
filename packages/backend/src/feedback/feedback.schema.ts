@@ -34,7 +34,7 @@ export const feedbackEntrySchema = z.object({
     id: z.string().uuid(),
     operationId: z.string().uuid(),
     kind: z.enum(["comment", "note"]),
-    displayAuthor: z.enum(["Persona A", "Persona B"]),
+    displayAuthor: z.enum(["Persona A", "Persona B", "Agente"]),
     title: z.string().min(1).max(160),
     body: z.string().min(1).max(8_000),
     target: feedbackTargetSchema.nullable(),

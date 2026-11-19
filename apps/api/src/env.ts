@@ -16,6 +16,8 @@ export function readEnvironment(input: NodeJS.ProcessEnv = process.env) {
     const env = z
         .object({
             DATABASE_URL: databaseUrl,
+            OPENAI_API_KEY: z.string().default(""),
+            AGENT_MODEL: z.string().trim().default(""),
             NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
             HOST: z.string().default("127.0.0.1"),
             PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -30,6 +32,8 @@ export function readEnvironment(input: NodeJS.ProcessEnv = process.env) {
                 .transform((path) => resolve(path)),
         })
         .parse(input);
+    if (Boolean(env.OPENAI_API_KEY) !== Boolean(env.AGENT_MODEL))
+        throw new Error("Configure both OPENAI_API_KEY and AGENT_MODEL, or leave both unset.");
     const origin = new URL(env.APP_ORIGIN);
     if (
         origin.username ||

@@ -10,6 +10,7 @@ import { NotesPage, SourcesPage } from "./library";
 import { RoomsPage } from "./rooms";
 import { MoodboardPage } from "./moodboard";
 import { DocumentPage } from "./documents";
+import { AgentPage } from "./agent";
 import { AuthGate } from "./auth";
 import "./styles.css";
 
@@ -23,6 +24,7 @@ const root = createRootRoute({
     ),
 });
 const routes = [
+    createRoute({ getParentRoute: () => root, path: "/agente", component: AgentPage }),
     createRoute({ getParentRoute: () => root, path: "/lista", component: ChecklistPage }),
     createRoute({ getParentRoute: () => root, path: "/referencias", component: MoodboardPage }),
     createRoute({ getParentRoute: () => root, path: "/", component: CollectionPage }),

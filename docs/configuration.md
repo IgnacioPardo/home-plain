@@ -39,3 +39,7 @@ docker compose up -d home
 Keep backups of both PostgreSQL and media, and verify restoration separately. Never use `down -v` unless you intend to erase the database. Container bootstrap uses the account hashes from ignored `.env`; they can be removed after initialization. The synthetic seed command is for the source checkout. For a container import, mount a private bundle under `/app/data` and pass that absolute path to `node dist/database.js import`.
 
 No DNS, tunnel credentials, external hosting, self-hosted runner or deployment automation is supplied. Sessions live in one API process and expire on restart; multiple replicas require shared sessions and throttling. Business data survives restarts in PostgreSQL.
+
+## Optional planning agent
+
+See [agent runtime](agent-runtime.md) for `OPENAI_API_KEY`/`AGENT_MODEL`, data sent to the provider, usage limits, recovery and review behavior. Leave both empty to run the application without model calls.

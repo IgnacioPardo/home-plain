@@ -29,6 +29,8 @@ services:
     environment:
       APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN to the HTTPS preview URL}
       DATABASE_URL: postgresql://${POSTGRES_USER:-home}:${POSTGRES_PASSWORD:?Set a database password}@database:5432/${POSTGRES_DB:-home_plain}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AGENT_MODEL: ${AGENT_MODEL:-}
       HOUSEHOLD_ID: ${HOUSEHOLD_ID:-00000000-0000-4000-8000-000000000902}
       HOUSEHOLD_NAME: ${HOUSEHOLD_NAME:-Home}
       AUTH_SHARED_USERNAME: ${AUTH_SHARED_USERNAME:-home}
