@@ -128,6 +128,24 @@ it("imports validated records atomically, preserves null prices, quantities and 
     expect((await f.store.dashboard(f.owner)).snapshot!.items).toHaveLength(4);
 });
 
+it("rolls back separately valid imports that would violate the retained catalog relationships", async () => {
+    await importHome(f.db, homeId, { collection });
+    const second = {
+        ...collection,
+        entries: [{ ...collection.entries[0], id: "different-reference" }],
+    };
+    expect(importBundleSchema.safeParse({ collection: second }).success).toBe(true);
+    await expect(importHome(f.db, homeId, { shopping, collection: second })).rejects.toThrow(
+        "Multiple references",
+    );
+    expect((await f.store.collection(f.owner))?.entries).toEqual(collection.entries);
+    expect((await f.store.dashboard(f.owner)).snapshot!.items).toHaveLength(0);
+    // The uniqueness rule is household-scoped, not global.
+    expect(await importHome(f.db, otherHomeId, { collection: second })).toMatchObject({
+        collection: 1,
+    });
+});
+
 it("retains committed purchases and feedback when all application connections are replaced", async () => {
     await importHome(f.db, homeId, { shopping });
     await f.store.setPurchased(f.owner, {

@@ -60,6 +60,18 @@ export async function importHome(db: HomeDatabase, householdId: string, input: u
                     .onConflictDoNothing()
                     .returning({ id: t.collectionEntries.id })
             ).length;
+        if (bundle.collection) {
+            // Separate valid bundles can conflict with the retained destination records.
+            // The household lock serializes imports; a failed merged validation rolls back all inserts.
+            const rows = await tx
+                .select({ payload: t.collectionEntries.payload })
+                .from(t.collectionEntries)
+                .where(eq(t.collectionEntries.householdId, householdId));
+            collectionSnapshotSchema.parse({
+                ...bundle.collection,
+                entries: rows.map((row) => row.payload),
+            });
+        }
         for (const document of bundle.content?.documents ?? [])
             imported.documents += (
                 await tx
