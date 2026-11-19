@@ -146,6 +146,64 @@ it("rolls back separately valid imports that would violate the retained catalog 
     });
 });
 
+it("retains each reference collection's provenance across additive imports and retries", async () => {
+    const atlas = {
+        version: 1,
+        importedAt: "2026-01-01T00:00:00.000Z",
+        status: "exploratory",
+        source: {
+            title: "Atlas example",
+            url: "https://example.com/atlas",
+            conversation: null,
+            sha256: "a".repeat(64),
+        },
+        references: [
+            {
+                id: "aaaaaaaaaaaaaa",
+                title: "Example",
+                projectKey: "https://example.com",
+                source: "https://example.com",
+                publisher: "Example",
+                styles: [],
+                rooms: [],
+                objects: [],
+                note: "",
+                quality: "editorial",
+                palette: [],
+                hero: false,
+                image: null,
+                thumbnail: null,
+            },
+        ],
+    };
+    const collectionMetadata = {
+        id: "pinterest",
+        title: "Second example",
+        url: "https://example.com/second",
+        importedAt: "2026-02-01T00:00:00.000Z",
+    };
+    const second = {
+        ...atlas,
+        importedAt: collectionMetadata.importedAt,
+        collections: [collectionMetadata],
+        references: [{ ...atlas.references[0], id: "bbbbbbbbbbbbbb", collection: "pinterest" }],
+    };
+    await importHome(f.db, homeId, { moodboard: atlas });
+    expect(await importHome(f.db, homeId, { moodboard: second })).toMatchObject({ references: 1 });
+    expect(await importHome(f.db, homeId, { moodboard: second })).toMatchObject({ references: 0 });
+    const saved = await f.store.moodboard(f.owner);
+    expect(saved?.references).toHaveLength(2);
+    expect(saved?.collections).toEqual([
+        {
+            id: "atlas",
+            title: atlas.source.title,
+            url: atlas.source.url,
+            importedAt: atlas.importedAt,
+        },
+        collectionMetadata,
+    ]);
+});
+
 it("retains committed purchases and feedback when all application connections are replaced", async () => {
     await importHome(f.db, homeId, { shopping });
     await f.store.setPurchased(f.owner, {

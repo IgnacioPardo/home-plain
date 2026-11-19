@@ -6,7 +6,7 @@ import * as t from "./schema.ts";
 import { snapshotSchema } from "../shopping/shopping.schema.ts";
 import { collectionSnapshotSchema } from "../collection/collection.schema.ts";
 import { contentSnapshotSchema } from "../content/content.schema.ts";
-import { moodboardSnapshotSchema } from "../moodboard/moodboard.schema.ts";
+import { moodboardSnapshotSchema, type MoodboardSnapshot } from "../moodboard/moodboard.schema.ts";
 import { feedbackSnapshotSchema } from "../feedback/feedback.schema.ts";
 
 export const importBundleSchema = z
@@ -87,10 +87,37 @@ export async function importHome(db: HomeDatabase, householdId: string, input: u
             ).length;
         if (bundle.moodboard) {
             const { references, ...metadata } = bundle.moodboard;
+            const [existing] = await tx
+                .select()
+                .from(t.referenceSources)
+                .where(eq(t.referenceSources.householdId, householdId));
+            const retained = existing
+                ? await tx
+                      .select({ payload: t.visualReferences.payload })
+                      .from(t.visualReferences)
+                      .where(eq(t.visualReferences.householdId, householdId))
+                : [];
+            const collections = new Map(
+                existing
+                    ? referenceCollections({
+                          ...existing.metadata,
+                          references: retained.map((row) => row.payload),
+                      }).map((collection) => [collection.id, collection])
+                    : [],
+            );
+            for (const collection of referenceCollections(bundle.moodboard))
+                if (!collections.has(collection.id)) collections.set(collection.id, collection);
+            const merged = {
+                ...(existing?.metadata ?? metadata),
+                collections: [...collections.values()],
+            };
             await tx
                 .insert(t.referenceSources)
-                .values({ householdId, metadata })
-                .onConflictDoNothing();
+                .values({ householdId, metadata: merged })
+                .onConflictDoUpdate({
+                    target: t.referenceSources.householdId,
+                    set: { metadata: merged },
+                });
             for (const reference of references)
                 imported.references += (
                     await tx
@@ -118,6 +145,22 @@ export async function importHome(db: HomeDatabase, householdId: string, input: u
             ).length;
         return imported;
     });
+}
+function referenceCollections(snapshot: MoodboardSnapshot) {
+    const collections = new Map(
+        (snapshot.collections ?? []).map((collection) => [collection.id, collection]),
+    );
+    for (const reference of snapshot.references) {
+        const id = reference.collection ?? "atlas";
+        if (!collections.has(id))
+            collections.set(id, {
+                id,
+                title: snapshot.source.title,
+                url: snapshot.source.url,
+                importedAt: snapshot.importedAt,
+            });
+    }
+    return [...collections.values()];
 }
 const bootstrapSchema = z
     .strictObject({
