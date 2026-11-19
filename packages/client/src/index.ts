@@ -17,3 +17,5 @@ export type {
     ContentIndex,
     ContentDocumentResult,
 } from "@repo/backend";
+
+export type { AgentRun, AgentProposal, StartAgent } from "@repo/backend";

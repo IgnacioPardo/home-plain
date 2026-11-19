@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { FeedbackNotes } from "./feedback";
 import { useState } from "react";
 import type { CollectionEntry } from "@repo/client";
@@ -14,7 +15,14 @@ export function NotesPage() {
     useContextLink("objeto", notes, setSelected);
     return (
         <>
-            <Heading title="Notas" />
+            <Heading
+                title="Notas"
+                action={
+                    <Link to="/agente" className="button">
+                        Planificar con un agente
+                    </Link>
+                }
+            />
             <FeedbackNotes />
             {notes.length > 0 && (
                 <div className="notes-grid">

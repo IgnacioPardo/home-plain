@@ -21,6 +21,8 @@ Open **http://localhost:5173**. Find the generated passwords in ignored `data/de
 
 Example links use `example.com` and are illustrative. No actual product photos, prices, ownership claims or personal decisions are included. The API listens on `127.0.0.1:3000`; the website proxies requests to it. Use coordinated alternative ports for another checkout. `docker compose -f compose.database.yml stop` preserves the database volume.
 
+Optional: configure the [planning agent](docs/agent-runtime.md) to prepare a room plan from existing purchases. It saves a proposal for review; accepting it creates a note. Without model credentials, the UI reports that the agent is unconfigured.
+
 For frontend-only synthetic states, run `pnpm dev:web` and open `/stories.html`. This development page is excluded from production.
 
 ## Use your own data

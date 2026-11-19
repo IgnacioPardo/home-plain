@@ -5,7 +5,13 @@ import { bodyLimit } from "hono/body-limit";
 import { trpcServer } from "@hono/trpc-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { z } from "zod";
-import { buildRouter, authSessionSchema, type HomeRepository, type Identity } from "@repo/backend";
+import {
+    buildRouter,
+    authSessionSchema,
+    type HomeRepository,
+    type AgentRunStore,
+    type Identity,
+} from "@repo/backend";
 import type { AuthenticationService } from "./auth/auth.service.ts";
 
 const credentialsSchema = z
@@ -16,6 +22,7 @@ export function createApp(
     origin: string,
     auth: AuthenticationService,
     mediaDirectory?: string,
+    agent?: AgentRunStore,
 ) {
     const app = new Hono<{ Variables: { session: Identity | null } }>();
     const allowed = new URL(origin);
@@ -108,7 +115,7 @@ export function createApp(
         "/trpc/*",
         trpcServer({
             endpoint: "/trpc",
-            router: buildRouter(store),
+            router: buildRouter(store, agent),
             createContext: (_options, c) => ({ session: c.get("session") }),
         }),
     );

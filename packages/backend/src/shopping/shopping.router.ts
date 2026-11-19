@@ -17,6 +17,9 @@ import {
     feedbackTargetSchema,
 } from "../feedback/feedback.schema.ts";
 
+import { AgentRunStore, AgentError } from "../agent/agent.store.ts";
+import { agentRunSchema, startAgentSchema } from "../agent/agent.schema.ts";
+
 export type HomeRepository = Pick<
     HomeStore,
     | "dashboard"
@@ -30,8 +33,46 @@ export type HomeRepository = Pick<
     | "createFeedback"
     | "hasMedia"
 >;
-export function buildRouter(store: HomeRepository) {
+export function buildRouter(store: HomeRepository, agent?: AgentRunStore) {
+    const runs = () => {
+        if (!agent) throw new AgentError("unconfigured");
+        return agent;
+    };
     return t.router({
+        agent: t.router({
+            list: protectedProcedure
+                .output(z.object({ configured: z.boolean(), runs: z.array(agentRunSchema) }))
+                .query(({ ctx }) =>
+                    safely(() =>
+                        agent
+                            ? agent.list(ctx.session)
+                            : Promise.resolve({ configured: false, runs: [] }),
+                    ),
+                ),
+            get: protectedProcedure
+                .input(z.strictObject({ id: z.string().uuid() }))
+                .output(agentRunSchema)
+                .query(({ ctx, input }) => safely(() => runs().get(ctx.session, input.id))),
+            start: ownerProcedure
+                .input(startAgentSchema)
+                .output(agentRunSchema)
+                .mutation(({ ctx, input }) => safely(() => runs().start(ctx.session, input))),
+            cancel: ownerProcedure
+                .input(z.strictObject({ id: z.string().uuid() }))
+                .output(agentRunSchema)
+                .mutation(({ ctx, input }) => safely(() => runs().cancel(ctx.session, input.id))),
+            decide: ownerProcedure
+                .input(
+                    z.strictObject({
+                        id: z.string().uuid(),
+                        decision: z.enum(["applied", "dismissed"]),
+                    }),
+                )
+                .output(agentRunSchema)
+                .mutation(({ ctx, input }) =>
+                    safely(() => runs().decide(ctx.session, input.id, input.decision)),
+                ),
+        }),
         auth: t.router({
             session: protectedProcedure.output(authSessionSchema).query(({ ctx }) => ctx.session),
         }),
@@ -93,6 +134,14 @@ async function safely<T>(operation: () => Promise<T>): Promise<T> {
     try {
         return await operation();
     } catch (error) {
+        if (error instanceof AgentError)
+            throw new TRPCError({
+                code: error.reason === "unconfigured" ? "PRECONDITION_FAILED" : "TOO_MANY_REQUESTS",
+                message:
+                    error.reason === "unconfigured"
+                        ? "El agente todavía no está configurado."
+                        : "Se alcanzó el límite de ejecuciones de este hogar. Volvé a intentar más tarde.",
+            });
         if (error instanceof HomeError) {
             const messages = {
                 not_found: {

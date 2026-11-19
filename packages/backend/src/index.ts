@@ -33,3 +33,14 @@ export type {
     ContentDocumentResult,
     ContentSnapshot,
 } from "./content/content.schema.ts";
+
+export { AgentRunStore, AgentError } from "./agent/agent.store.ts";
+export { runAgentOnce, startAgentWorker, PlannerError } from "./agent/agent.worker.ts";
+export { startAgentSchema, agentRunSchema, agentProposalSchema } from "./agent/agent.schema.ts";
+export type {
+    AgentRun,
+    AgentProposal,
+    AgentPlanner,
+    AgentContext,
+    StartAgent,
+} from "./agent/agent.schema.ts";
